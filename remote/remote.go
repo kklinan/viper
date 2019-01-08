@@ -84,6 +84,8 @@ func getConfigManager(rp viper.RemoteProvider) (crypt.ConfigManager, error) {
 		}
 		if rp.Provider() == "etcd" {
 			cm, err = crypt.NewEtcdConfigManager([]string{rp.Endpoint()}, kr)
+		} else if rp.Provider() == "etcd3" {
+			cm, err = crypt.NewEtcd3ConfigManager([]string{rp.Endpoint()}, kr)
 		} else if rp.Provider() == "zookeeper" {
 			cm, err = crypt.NewZookeeperConfigManager([]string{rp.Endpoint()}, kr)
 		} else {
@@ -92,6 +94,8 @@ func getConfigManager(rp viper.RemoteProvider) (crypt.ConfigManager, error) {
 	} else {
 		if rp.Provider() == "etcd" {
 			cm, err = crypt.NewStandardEtcdConfigManager([]string{rp.Endpoint()})
+		} else if rp.Provider() == "etcd3" {
+			cm, err = crypt.NewStandardEtcd3ConfigManager([]string{rp.Endpoint()})
 		} else if rp.Provider() == "zookeeper" {
 			cm, err = crypt.NewStandardZookeeperConfigManager([]string{rp.Endpoint()})
 		} else {

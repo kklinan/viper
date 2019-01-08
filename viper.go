@@ -87,7 +87,7 @@ func (str UnsupportedConfigError) Error() string {
 }
 
 // Denotes encountering an unsupported remote
-// provider. Currently only etcd, Consul, zookeeper are
+// provider. Currently only etcd, etcd clientv3, Consul, zookeeper are
 // supported.
 type UnsupportedRemoteProviderError string
 
@@ -230,7 +230,7 @@ func New() *Viper {
 func Reset() {
 	v = New()
 	SupportedExts = []string{"json", "toml", "yaml", "yml", "hcl"}
-	SupportedRemoteProviders = []string{"etcd", "consul", "zookeeper"}
+	SupportedRemoteProviders = []string{"etcd", "etcd3", "consul", "zookeeper"}
 }
 
 type defaultRemoteProvider struct {
@@ -271,7 +271,7 @@ type RemoteProvider interface {
 var SupportedExts = []string{"json", "toml", "yaml", "yml", "properties", "props", "prop", "hcl"}
 
 // Universally supported remote providers.
-var SupportedRemoteProviders []string = []string{"etcd", "consul", "zookeeper"}
+var SupportedRemoteProviders []string = []string{"etcd", "etcd3", "consul", "zookeeper"}
 
 func OnConfigChange(run func(in fsnotify.Event)) { v.OnConfigChange(run) }
 func (v *Viper) OnConfigChange(run func(in fsnotify.Event)) {
@@ -419,7 +419,7 @@ func (v *Viper) AddConfigPath(in string) {
 
 // AddRemoteProvider adds a remote configuration source.
 // Remote Providers are searched in the order they are added.
-// provider is a string value, "etcd", "consul" or "zookeeper" are currently supported.
+// provider is a string value, "etcd", "etcd3", "consul" or "zookeeper" are currently supported.
 // endpoint is the url.  etcd requires http://ip:port  consul requires ip:port
 // path is the path in the k/v store to retrieve configuration
 // To retrieve a config file called myapp.json from /configs/myapp.json
@@ -448,7 +448,7 @@ func (v *Viper) AddRemoteProvider(provider, endpoint, path string) error {
 
 // AddSecureRemoteProvider adds a remote configuration source.
 // Secure Remote Providers are searched in the order they are added.
-// provider is a string value, "etcd", "consul" or "zookeeper" are currently supported.
+// provider is a string value, "etcd", "etcd3",  "consul" or "zookeeper" are currently supported.
 // endpoint is the url.  etcd requires http://ip:port  consul requires ip:port
 // secretkeyring is the filepath to your openpgp secret keyring.  e.g. /etc/secrets/myring.gpg
 // path is the path in the k/v store to retrieve configuration
