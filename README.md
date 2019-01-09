@@ -2,6 +2,8 @@
 
 Go configuration with fangs!
 
+Forked from [spf13/viper](https://github.com/spf13/viper), On this basis, support etcd client V3 and zookeeper, and maintain compatibility and continuous follow-up with the original project.
+
 Many Go projects are built using Viper including:
 
 * [Hugo](http://gohugo.io)
@@ -344,14 +346,14 @@ viper.BindFlagValues("my-flags", fSet)
 To enable remote support in Viper, do a blank import of the `viper/remote`
 package:
 
-`import _ "github.com/spf13/viper/remote"`
+`import _ "github.com/kklinan/viper/remote"`
 
 Viper will read a config string (as JSON, TOML, YAML or HCL) retrieved from a path
 in a Key/Value store such as etcd, Consul or zookeeper.  These values take precedence over
 default values, but are overridden by configuration values retrieved from disk,
 flags, or environment variables.
 
-Viper uses [crypt](https://github.com/xordataexchange/crypt) to retrieve
+Viper uses [crypt](https://github.com/kklinan/crypt) to retrieve
 configuration from the K/V store, which means that you can store your
 configuration values encrypted and have them automatically decrypted if you have
 the correct gpg keyring.  Encryption is optional.
@@ -363,7 +365,7 @@ independently of it.
 K/V store. `crypt` defaults to etcd on http://127.0.0.1:4001.
 
 ```bash
-$ go get github.com/xordataexchange/crypt/bin/crypt
+$ go get github.com/kklinan/crypt/bin/crypt
 $ crypt set -plaintext /config/hugo.json /Users/hugo/settings/config.json
 ```
 
