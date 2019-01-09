@@ -1576,6 +1576,7 @@ func (v *Viper) WatchRemoteConfig() error {
 	return v.watchKeyValueConfig()
 }
 
+func WatchRemoteConfigOnChannel() error { return v.WatchRemoteConfigOnChannel() }
 func (v *Viper) WatchRemoteConfigOnChannel() error {
 	return v.watchKeyValueConfigOnChannel()
 }
