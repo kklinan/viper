@@ -408,7 +408,8 @@ fmt.Println(viper.Get("hostname")) // myhostname.com
 ### Remote Key/Value Store Example - Encrypted
 
 ```go
-viper.AddSecureRemoteProvider("etcd","http://127.0.0.1:4001","/config/hugo.json","/etc/secrets/mykeyring.gpg")
+// etcd clientv3
+viper.AddSecureRemoteProvider("etcd3","http://127.0.0.1:4001","/config/hugo.json","/etc/secrets/mykeyring.gpg")
 viper.SetConfigType("json") // because there is no file extension in a stream of bytes,  supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop"
 err := viper.ReadRemoteConfig()
 ```
@@ -419,7 +420,8 @@ err := viper.ReadRemoteConfig()
 // alternatively, you can create a new viper instance.
 var runtime_viper = viper.New()
 
-runtime_viper.AddRemoteProvider("etcd", "http://127.0.0.1:4001", "/config/hugo.yml")
+// etcd clientv3
+runtime_viper.AddRemoteProvider("etcd3", "http://127.0.0.1:4001", "/config/hugo.yml")
 runtime_viper.SetConfigType("yaml") // because there is no file extension in a stream of bytes, supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop"
 
 // read from remote config the first time.
@@ -445,6 +447,17 @@ go func(){
 	    runtime_viper.Unmarshal(&runtime_conf)
 	}
 }()
+
+// or WatchRemoteConfigOnChannel()
+err = viper.WatchRemoteConfigOnChannel()
+if err != nil {
+    fmt.Println(err)
+}
+
+// get configuration information at any time
+for {
+    fmt.Println(viper.Get("hostname"), viper.GetInt32("port"))
+}
 ```
 
 ## Getting Values From Viper
