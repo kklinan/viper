@@ -11,9 +11,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/spf13/viper"
-
-	crypt "github.com/bketelsen/crypt/config"
+	crypt "github.com/kklinan/crypt/config"
+	"github.com/kklinan/viper"
 )
 
 type remoteConfigProvider struct{}
@@ -85,18 +84,22 @@ func getConfigManager(rp viper.RemoteProvider) (crypt.ConfigManager, error) {
 		switch rp.Provider() {
 		case "etcd":
 			cm, err = crypt.NewEtcdConfigManager([]string{rp.Endpoint()}, kr)
-		case "firestore":
-			cm, err = crypt.NewFirestoreConfigManager([]string{rp.Endpoint()}, kr)
-		default:
+		} else if rp.Provider() == "etcd3" {
+			cm, err = crypt.NewEtcd3ConfigManager([]string{rp.Endpoint()}, kr)
+		} else if rp.Provider() == "zookeeper" {
+			cm, err = crypt.NewZookeeperConfigManager([]string{rp.Endpoint()}, kr)
+		} else {
 			cm, err = crypt.NewConsulConfigManager([]string{rp.Endpoint()}, kr)
 		}
 	} else {
 		switch rp.Provider() {
 		case "etcd":
 			cm, err = crypt.NewStandardEtcdConfigManager([]string{rp.Endpoint()})
-		case "firestore":
-			cm, err = crypt.NewStandardFirestoreConfigManager([]string{rp.Endpoint()})
-		default:
+		} else if rp.Provider() == "etcd3" {
+			cm, err = crypt.NewStandardEtcd3ConfigManager([]string{rp.Endpoint()})
+		} else if rp.Provider() == "zookeeper" {
+			cm, err = crypt.NewStandardZookeeperConfigManager([]string{rp.Endpoint()})
+		} else {
 			cm, err = crypt.NewStandardConsulConfigManager([]string{rp.Endpoint()})
 		}
 	}

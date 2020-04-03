@@ -5,6 +5,7 @@ Go configuration with fangs!
 [![Actions](https://github.com/spf13/viper/workflows/CI/badge.svg)](https://github.com/spf13/viper)
 [![Join the chat at https://gitter.im/spf13/viper](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/spf13/viper?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GoDoc](https://godoc.org/github.com/spf13/viper?status.svg)](https://godoc.org/github.com/spf13/viper)
+Forked from [spf13/viper](https://github.com/spf13/viper), On this basis, support etcd client V3 and zookeeper, and maintain compatibility and continuous follow-up with the original project.
 
 Many Go projects are built using Viper including:
 
@@ -36,7 +37,7 @@ and formats. It supports:
 * reading from JSON, TOML, YAML, HCL, envfile and Java properties config files
 * live watching and re-reading of config files (optional)
 * reading from environment variables
-* reading from remote config systems (etcd or Consul), and watching changes
+* reading from remote config systems (etcd, Consul or zookeeper), and watching changes
 * reading from command line flags
 * reading from buffer
 * setting explicit values
@@ -393,14 +394,14 @@ viper.BindFlagValues("my-flags", fSet)
 To enable remote support in Viper, do a blank import of the `viper/remote`
 package:
 
-`import _ "github.com/spf13/viper/remote"`
+`import _ "github.com/kklinan/viper/remote"`
 
-Viper will read a config string (as JSON, TOML, YAML, HCL or envfile) retrieved from a path
-in a Key/Value store such as etcd or Consul.  These values take precedence over
+Viper will read a config string (as JSON, TOML, YAML or HCL) retrieved from a path
+in a Key/Value store such as etcd, Consul or zookeeper.  These values take precedence over
 default values, but are overridden by configuration values retrieved from disk,
 flags, or environment variables.
 
-Viper uses [crypt](https://github.com/bketelsen/crypt) to retrieve
+Viper uses [crypt](https://github.com/kklinan/crypt) to retrieve
 configuration from the K/V store, which means that you can store your
 configuration values encrypted and have them automatically decrypted if you have
 the correct gpg keyring.  Encryption is optional.
@@ -412,7 +413,7 @@ independently of it.
 K/V store. `crypt` defaults to etcd on http://127.0.0.1:4001.
 
 ```bash
-$ go get github.com/bketelsen/crypt/bin/crypt
+$ go get github.com/kklinan/crypt/bin/crypt
 $ crypt set -plaintext /config/hugo.json /Users/hugo/settings/config.json
 ```
 
@@ -467,8 +468,9 @@ Of course, you're allowed to use `SecureRemoteProvider` also
 ### Remote Key/Value Store Example - Encrypted
 
 ```go
-viper.AddSecureRemoteProvider("etcd","http://127.0.0.1:4001","/config/hugo.json","/etc/secrets/mykeyring.gpg")
-viper.SetConfigType("json") // because there is no file extension in a stream of bytes,  supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop", "env", "dotenv"
+// etcd clientv3
+viper.AddSecureRemoteProvider("etcd3","http://127.0.0.1:4001","/config/hugo.json","/etc/secrets/mykeyring.gpg")
+viper.SetConfigType("json") // because there is no file extension in a stream of bytes,  supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop"
 err := viper.ReadRemoteConfig()
 ```
 
@@ -478,8 +480,9 @@ err := viper.ReadRemoteConfig()
 // alternatively, you can create a new viper instance.
 var runtime_viper = viper.New()
 
-runtime_viper.AddRemoteProvider("etcd", "http://127.0.0.1:4001", "/config/hugo.yml")
-runtime_viper.SetConfigType("yaml") // because there is no file extension in a stream of bytes, supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop", "env", "dotenv"
+// etcd clientv3
+runtime_viper.AddRemoteProvider("etcd3", "http://127.0.0.1:4001", "/config/hugo.yml")
+runtime_viper.SetConfigType("yaml") // because there is no file extension in a stream of bytes, supported extensions are "json", "toml", "yaml", "yml", "properties", "props", "prop"
 
 // read from remote config the first time.
 err := runtime_viper.ReadRemoteConfig()
@@ -504,6 +507,17 @@ go func(){
 	    runtime_viper.Unmarshal(&runtime_conf)
 	}
 }()
+
+// or WatchRemoteConfigOnChannel()
+err = viper.WatchRemoteConfigOnChannel()
+if err != nil {
+    fmt.Println(err)
+}
+
+// get configuration information at any time
+for {
+    fmt.Println(viper.Get("hostname"), viper.GetInt32("port"))
+}
 ```
 
 ## Getting Values From Viper
